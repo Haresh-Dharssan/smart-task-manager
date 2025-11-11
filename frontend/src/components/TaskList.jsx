@@ -42,7 +42,7 @@ export default function TaskList({ tasks, onTaskChange }) {
             key={task._id}
             className="flex flex-col sm:flex-row sm:items-center justify-between bg-gray-50 border border-gray-200 rounded-lg p-4 shadow-sm"
           >
-            <div className="flex items-stretch sm:items-center gap-4"> {/* 🆕 changed items-center → items-stretch */}
+            <div className="flex items-stretch sm:items-center gap-4">
               
               <div className={`w-20 flex-shrink-0 text-center text-sm ${
                 task.status === "completed"
@@ -53,14 +53,12 @@ export default function TaskList({ tasks, onTaskChange }) {
                 <p className={`text-xs mt-1`}>{time}</p>
               </div>
 
-              {/* 🆕 Divider Line */}
               <div className={`self-stretch border-l-2 mx-3 ${
                 task.status === "completed"
                   ? "border-green-600"
                   : "border-red-500"
               }`}></div>
 
-              {/* 📝 Task content */}
               <div>
                 <h3
                   className={`font-semibold text-lg ${
@@ -76,10 +74,18 @@ export default function TaskList({ tasks, onTaskChange }) {
                     {task.description}
                   </p>
                 )}
+                {task.dueDate && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    📅 Due: {new Date(task.dueDate).toLocaleDateString("en-GB", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "2-digit",
+                    })}
+                  </p>
+                )}
               </div>
             </div>
-
-            {/* ✅ Action Buttons */}
+            
             <div className="flex gap-2 mt-3 sm:mt-0">
               <button
                 onClick={() => toggleStatus(task)}

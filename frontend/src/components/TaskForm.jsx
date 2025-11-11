@@ -4,11 +4,12 @@ import API from "../services/api";
 export default function TaskForm({ onTaskAdded }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [dueDate, setDueDate] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await API.post("/tasks", { title, description });
+      await API.post("/tasks", { title, description, dueDate });
       setTitle("");
       setDescription("");
       onTaskAdded();
@@ -45,6 +46,15 @@ export default function TaskForm({ onTaskAdded }) {
           onChange={(e) => setDescription(e.target.value)}
           rows="5"
           className="flex-1 p-3 border border-gray-300 text-gray-900 rounded-lg focus:outline-none focus:ring-2 resize-none break-words whitespace-pre-wrap "
+        />
+      </div>
+      <div className="flex flex-col gap-2 mt-4">
+        <label className="text-sm font-medium text-gray-700">Due Date</label>
+        <input
+          type="date"
+          value={dueDate}
+          onChange={(e) => setDueDate(e.target.value)}
+          className="p-3 border border-gray-300 text-gray-900 rounded-lg focus:outline-none focus:ring-2"
         />
       </div>
     </form>

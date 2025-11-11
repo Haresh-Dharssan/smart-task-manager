@@ -2,11 +2,12 @@ import Task from "../models/taskModel.js";
 
 export const createTask = async (req, res) => {
   try {
-    const { title, description} = req.body;
+    const { title, description,dueDate} = req.body;
 
     const task = await Task.create({
       title,
       description,
+      dueDate,
       user: req.user._id,
     });
 
