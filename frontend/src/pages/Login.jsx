@@ -21,7 +21,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-blue-500 to-cyan-400">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500">
       <div className="bg-white/10 backdrop-blur-md p-8 rounded-2xl shadow-xl w-full max-w-md text-white">
         <h2 className="text-3xl font-semibold mb-6 text-center">Login</h2>
 
@@ -52,7 +52,7 @@ export default function Login() {
 
           <button
             type="submit"
-            className="w-full py-3 bg-gradient-to-r from-cyan-500 via-blue-700 to-indigo-500 rounded-lg font-semibold hover:scale-[1.02] transition-transform duration-200"
+            className="w-full py-3 bg-pink-500 rounded-lg font-semibold hover:scale-[1.02] transition-transform duration-200"
           >
             Sign In
           </button>

@@ -1,13 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import API from "../services/api";
 import TaskForm from "../components/TaskForm";
 import TaskList from "../components/TaskList";
 import { useNavigate } from "react-router-dom";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 export default function Dashboard() {
   const [tasks, setTasks] = useState([]);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
+  const dropdownRef = useRef(null);
 
   const fetchTasks = async () => {
     try {
@@ -23,10 +25,13 @@ export default function Dashboard() {
     navigate("/login");
   };
 
+  const handleProfile = () => {
+    navigate("/profile");
+  };
+
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     const token = storedUser?.token;
-
     if (!token) {
       navigate("/login");
       return;
@@ -34,59 +39,88 @@ export default function Dashboard() {
 
     try {
       const decoded = jwtDecode(token);
-      const currentTime = Date.now() / 1000; 
-
+      const currentTime = Date.now() / 1000;
       if (decoded.exp < currentTime) {
-        console.warn("Token expired");
         localStorage.removeItem("user");
         navigate("/login");
         return;
       }
     } catch (err) {
-      console.error("Invalid token:", err);
       localStorage.removeItem("user");
       navigate("/login");
-      return;
     }
 
     fetchTasks();
+  }, [navigate]);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    return () => {
+       document.removeEventListener("mousedown", handleClickOutside);
+       document.removeEventListener("touchstart", handleClickOutside);
+    }
   }, []);
+
+  const user = JSON.parse(localStorage.getItem("user"));
+  const userName = user?.user?.name || user?.name || "User";
 
   return (
     <div className="relative min-h-screen text-white">
-      <div className="absolute inset-0 -z-10 bg-gradient-to-br from-indigo-600 via-blue-500 to-cyan-400"></div>
-      <nav className="bg-black/30 backdrop-blur-lg px-6 py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 shadow-md border-b border-white/10">
+      <div className="absolute inset-0 -z-10 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500"></div>
+
+      {/* 🌟 NAVBAR */}
+      <nav className="bg-black/30 backdrop-blur-lg px-6 py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 shadow-md border-b border-white/10 relative z-50">
         <h1 className="text-2xl font-bold tracking-wide text-center sm:text-left text-white">
           Smart Task Manager
         </h1>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
-          <div className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full shadow-sm">
-            <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white font-semibold uppercase">
-              {JSON.parse(localStorage.getItem("user"))?.user?.name?.[0] ||
-                  JSON.parse(localStorage.getItem("user"))?.name?.[0] ||
-                  "U"}
-            </div>
-            <span className="text-sm font-medium text-white/90">
-              {JSON.parse(localStorage.getItem("user"))?.user?.name ||  
-                JSON.parse(localStorage.getItem("user"))?.name ||
-                "User"}
-            </span>
-          </div>
+
+        {/* 👤 User Menu */}
+        <div ref={dropdownRef} className="relative">
           <button
-            onClick={handleLogout}
-            className="w-full sm:w-auto px-4 py-2 text-sm font-semibold bg-red-500/90 hover:bg-red-500 rounded-lg text-white transition-colors duration-200 shadow-sm"
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+            className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full shadow-sm hover:bg-white/20 transition"
           >
-            Logout
+            <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white font-semibold uppercase">
+              {userName?.[0] || "U"}
+            </div>
+            <span className="text-sm font-medium text-white/90">{userName}</span>
           </button>
+
+          {/* Dropdown */}
+          {dropdownOpen && (
+            <div
+              className={`absolute sm:right-0 sm:mt-2 mt-3 left-1/2 sm:left-auto transform sm:translate-x-0 -translate-x-1/2 
+              w-48 bg-white text-gray-800 rounded-lg shadow-lg border border-gray-200 overflow-hidden z-50 transition-all duration-150 
+              ${dropdownOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
+            >
+              <button
+                onClick={handleProfile}
+                className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
+              >
+                🧑 Profile
+              </button>
+              <button
+                onClick={handleLogout}
+                className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
+              >
+                🚪 Logout
+              </button>
+            </div>
+          )}
         </div>
       </nav>
 
-
-      <div className="max-w-3xl mx-auto bg-white/10 backdrop-blur-md shadow-xl rounded-2xl mt-10 p-8">
-        <h2 className="text-4xl text-white font-semibold text-center mb-8 font-serif">Dashboard</h2>
+      {/* MAIN CONTENT */}
+      <div className="max-w-3xl mx-auto bg-white/10 backdrop-blur-md shadow-xl rounded-2xl mt-10 p-8 relative z-0">
+        <h2 className="text-3xl font-semibold text-center mb-8 font-serif">Dashboard</h2>
 
         <TaskForm onTaskAdded={fetchTasks} />
-
         <div className="mt-8">
           <TaskList tasks={tasks} onTaskChange={fetchTasks} />
         </div>
