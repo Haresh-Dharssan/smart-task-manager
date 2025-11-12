@@ -3,6 +3,7 @@ import API from "../services/api";
 import TaskForm from "../components/TaskForm";
 import TaskList from "../components/TaskList";
 import { useNavigate } from "react-router-dom";
+import {jwtDecode} from "jwt-decode";
 
 export default function Dashboard() {
   const [tasks, setTasks] = useState([]);
@@ -23,6 +24,31 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    const token = storedUser?.token;
+
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const decoded = jwtDecode(token);
+      const currentTime = Date.now() / 1000; 
+
+      if (decoded.exp < currentTime) {
+        console.warn("Token expired");
+        localStorage.removeItem("user");
+        navigate("/login");
+        return;
+      }
+    } catch (err) {
+      console.error("Invalid token:", err);
+      localStorage.removeItem("user");
+      navigate("/login");
+      return;
+    }
+
     fetchTasks();
   }, []);
 

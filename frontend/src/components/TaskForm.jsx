@@ -5,9 +5,17 @@ export default function TaskForm({ onTaskAdded }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage(""); 
+
+    if (dueDate && new Date(dueDate) < Date.now()) {
+      setErrorMessage("⚠️ Due date cannot be in the past.");
+      setTimeout(() => setErrorMessage(""), 3000);
+      return;
+    }
     try {
       await API.post("/tasks", { title, description, dueDate });
       setTitle("");
@@ -54,9 +62,12 @@ export default function TaskForm({ onTaskAdded }) {
           type="date"
           value={dueDate}
           onChange={(e) => setDueDate(e.target.value)}
-          className="p-3 border border-gray-300 text-gray-900 rounded-lg focus:outline-none focus:ring-2"
+          className="p-3 border border-gray-300 text-gray-400 rounded-lg focus:outline-none focus:ring-2"
         />
       </div>
+      {errorMessage && (
+        <p className="mt-3 text-sm text-red-600 font-medium">{errorMessage}</p>
+      )}
     </form>
   );
 }
