@@ -1,6 +1,10 @@
 import API from "../services/api";
+import { useState } from "react";
 
 export default function TaskList({ tasks, onTaskChange }) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortOption, setSortOption] = useState("default");
+
   const deleteTask = async (id) => {
     try {
       await API.delete(`/tasks/${id}`);
@@ -20,13 +24,51 @@ export default function TaskList({ tasks, onTaskChange }) {
     }
   };
 
+  const filteredTasks = tasks.filter((task) => {
+    const query = searchTerm.toLowerCase();
+    return (
+      task.title.toLowerCase().includes(query) ||
+      task.description?.toLowerCase().includes(query)
+    );
+  });
+
+  const sortedTasks = [...filteredTasks].sort((a, b) => {
+    if (sortOption === "completed") {
+      return a.status === "completed" && b.status !== "completed" ? -1 : 1;
+    } else if (sortOption === "pending") {
+      return a.status === "pending" && b.status !== "pending" ? -1 : 1;
+    } else {
+      return 0;
+    }
+  });
+
   if (tasks.length === 0) {
     return <p className="text-center text-white mt-6">No tasks yet.</p>;
   }
 
   return (
+    <div>
+      <div className="mb-4 flex justify-between" >
+        <input
+          type="text"
+          placeholder="Search tasks..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full p-3 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
+         <select
+          value={sortOption}
+          onChange={(e) => setSortOption(e.target.value)}
+          className="w-full sm:w-52 p-3 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        >
+          <option value="default">Sort by: Default</option>
+          <option value="completed">Sort by: Completed</option>
+          <option value="pending">Sort by: Pending</option>
+        </select>
+      </div>
     <ul className="space-y-4">
-      {tasks.map((task) => {
+      {sortedTasks.length > 0 ? (
+          sortedTasks.map((task) => {
         const createdAt = new Date(task.createdAt);
         const day = createdAt.getDate();
         const month = createdAt.toLocaleString("en-US", { month: "short" }); 
@@ -107,7 +149,13 @@ export default function TaskList({ tasks, onTaskChange }) {
             </div>
           </li>
         );
-      })}
+      })
+    ) : (
+          <p className="text-center text-gray-500 mt-6">
+            No matching tasks found.
+          </p>
+    )}
     </ul>
+  </div>
   );
 }
