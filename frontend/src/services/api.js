@@ -15,7 +15,9 @@ API.interceptors.request.use((config) => {
 API.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const status = error.response?.status;
+    const current = window.location.pathname;
+    if (status === 401 && current !== "/login" && current !== "/register") {
       localStorage.removeItem("user");
       window.location.href = "/login"; 
     }

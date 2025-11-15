@@ -4,19 +4,30 @@ import bcrypt from "bcryptjs";
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, "Please enter your name"],
+    required: true,
   },
   email: {
     type: String,
-    required: [true, "Please enter your email"],
+    required: true,
     unique: true,
     match: [/\S+@\S+\.\S+/, "Please enter a valid email"],
   },
   password: {
     type: String,
-    required: [true, "Please enter your password"],
+    required: true,
     minlength: 6,
   },
+  phone: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  isPhoneVerified: {
+    type: Boolean,
+    default: false,
+  },
+  otp: String,
+  otpExpiresAt: Date,
   },{timestamp: true}
 );
 

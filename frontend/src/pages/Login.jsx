@@ -27,26 +27,34 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block mb-1 text-sm font-medium">Email</label>
+            <label htmlFor="email" className="block mb-1 text-sm font-medium">
+              Email
+            </label>
             <input
+              id="email"
+              name="email"
               type="email"
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full p-3 rounded-lg bg-white/20 placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-pink-400"
+              className="w-full p-3 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400"
             />
           </div>
 
           <div>
-            <label className="block mb-1 text-sm font-medium">Password</label>
+            <label htmlFor="password" className="block mb-1 text-sm font-medium">
+              Password
+            </label>
             <input
+              id="password"
+              name="password"
               type="password"
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full p-3 rounded-lg bg-white/20 placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-pink-400"
+              className="w-full p-3 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400"
             />
           </div>
 
