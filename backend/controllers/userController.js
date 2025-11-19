@@ -1,6 +1,5 @@
 import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";
-import twilio from "twilio";
 import dotenv from "dotenv";
 dotenv.config();
 const generateToken = (id) => {
@@ -9,13 +8,8 @@ const generateToken = (id) => {
 
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password, phone, otp, enteredOtp } = req.body;
-    if(!otp) return res.status(400).json({ message: "Please request for a OTP." });
-    if(!enteredOtp) return res.status(400).json({ message: "Please enter the OTP." });
-    if (otp !== enteredOtp)
-      return res.status(400).json({ message: "Invalid OTP" });
-
-    const user = await User.create({ name, email, password, phone, isPhoneVerified: true });
+    const { name, email, password, phone} = req.body;
+    const user = await User.create({ name, email, password, phone});
 
     res.status(201).json({
       success: true,
@@ -24,7 +18,6 @@ export const registerUser = async (req, res) => {
       name: user.name,
       email: user.email,
       phone: user.phone,
-      isPhoneVerified: user.isPhoneVerified,
       token: generateToken(user._id),
     });
   } catch (error) {
@@ -34,14 +27,21 @@ export const registerUser = async (req, res) => {
 
 export const validate = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, phone } = req.body;
     const emailRegex = /\S+@\S+\.\S+/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({ message: "Invalid email format" });
     }
-    const existing = await User.findOne({ email });
-    if (existing) {
+    const emailexisting = await User.findOne({ email });
+    if (emailexisting) {
       return res.status(400).json({ message: "Email already exists" });
+    }
+    if(phone.length < 10){
+      return res.status(400).json({ message: "Phone number must be of 10 digits" });
+    }
+    const phoneExists = await User.findOne({ phone });
+    if (phoneExists) {
+      return res.status(400).json({ message: "Phone number already exists" });
     }
     if (!password || password.length < 6) {
       return res.status(400).json({ message: "Password must be at least 6 characters" });
@@ -75,24 +75,6 @@ export const loginUser = async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
-  }
-};
-
-const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-export const sendotp = async (req, res) => {
-  try {
-    const { phone } = req.body;
-    const otp = Math.floor(1000 + Math.random() * 9000).toString();
-
-    await client.messages.create({
-      body: `Your verification code is ${otp}`,
-      from: process.env.TWILIO_PHONE_NUMBER,
-      to: phone,
-    });
-
-    res.json({ otp }); 
-  } catch (err) {
-    res.status(500).json({ message: "Error sending OTP", error: err.message });
   }
 };
 

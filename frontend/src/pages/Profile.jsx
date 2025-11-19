@@ -12,13 +12,18 @@ export default function Profile() {
             {userData?.name?.[0] || "U"}
           </div>
 
-          <p className="text-lg font-medium">
-            <span className="font-semibold">Name:</span> {userData?.name || "User"}
+          <p className="text-lg font-semibold">
+            Name : {userData?.name || "User"}
           </p>
 
-          <p className="text-lg font-medium">
-            <span className="font-semibold">Email:</span> {userData?.email || "N/A"}
+          <p className="text-lg font-semibold">
+            Email : {userData?.email || "N/A"}
           </p>
+
+          <p className="text-lg font-semibold">
+            Phone : {userData?.phone || "N/A"}
+          </p>
+
         </div>
 
         <button

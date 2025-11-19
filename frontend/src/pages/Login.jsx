@@ -16,6 +16,7 @@ export default function Login() {
       toast.success("Login successful!");
       navigate("/");
     } catch (error) {
+      console.log("Login error:", error);
       toast.error(error.response?.data?.message || "Login failed");
     }
   };

@@ -74,13 +74,11 @@ export default function Dashboard() {
     <div className="relative min-h-screen text-white">
       <div className="absolute inset-0 -z-10 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500"></div>
 
-      {/* 🌟 NAVBAR */}
       <nav className="bg-black/30 backdrop-blur-lg px-6 py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 shadow-md border-b border-white/10 relative z-50">
         <h1 className="text-2xl font-bold tracking-wide text-center sm:text-left text-white">
           Smart Task Manager
         </h1>
 
-        {/* 👤 User Menu */}
         <div ref={dropdownRef} className="relative">
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
